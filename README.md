@@ -43,3 +43,40 @@ Students should:
 **Students complete ANY 3 questions**
 
 - **Student Instructions**: See `student-template/README.md`
+@app.route("/api/inventory/alerts", methods=["GET"])
+def get_alerts():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, product_name, quantity, reorder_level
+        FROM inventory
+        WHERE quantity <= reorder_level
+    """)
+
+    rows = cur.fetchall()
+
+    alerts = [
+        {
+            "id": str(row[0]),
+            "product_name": row[1],
+            "quantity": row[2],
+            "reorder_level": row[3]
+        }
+        for row in rows
+    ]
+
+    cur.close()
+    conn.close()
+
+    return jsonify(alerts)
+
+  SELECT
+    customer_id,
+    SUM(total_amount) AS total_order_value
+FROM orders
+WHERE order_date >= '2025-01-01'
+  AND order_date < '2026-01-01'
+GROUP BY customer_id
+ORDER BY total_order_value DESC
+LIMIT 5;
